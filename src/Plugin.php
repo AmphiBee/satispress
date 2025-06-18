@@ -47,7 +47,8 @@ class Plugin extends BasePlugin implements Composable {
 			->register_hooks( $container->get( 'hooks.health_check' ) )
 			->register_hooks( $container->get( 'hooks.request_handler' ) )
 			->register_hooks( $container->get( 'hooks.rest' ) )
-			->register_hooks( $container->get( 'hooks.package_archiver' ) );
+			->register_hooks( $container->get( 'hooks.package_archiver' ) )
+			->register_hooks( $container->get( 'hooks.repository_cache' ) );
 
 		if ( is_admin() ) {
 			$this
