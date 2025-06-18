@@ -154,6 +154,10 @@ class ServiceProvider implements ServiceProviderInterface {
 			);
 		};
 
+		$container['hooks.repository_cache'] = function () {
+			return new Provider\RepositoryCache();
+		};
+
 		$container['htaccess.handler'] = function ( $container ) {
 			return new Htaccess( $container['storage.working_directory'] );
 		};
@@ -326,6 +330,17 @@ class ServiceProvider implements ServiceProviderInterface {
 		};
 
 		$container['route.composer'] = function ( $container ) {
+			// Use cached version if enabled
+			$use_cache = get_option( 'satispress_enable_cache', true );
+			
+			if ( $use_cache ) {
+				return new Route\CachedComposer(
+					$container['repository.whitelist'],
+					$container['transformer.composer_repository'],
+					$container['cache.duration']
+				);
+			}
+			
 			return new Route\Composer(
 				$container['repository.whitelist'],
 				$container['transformer.composer_repository']
@@ -431,6 +446,23 @@ class ServiceProvider implements ServiceProviderInterface {
 
 		$container['version.parser'] = function () {
 			return new ComposerVersionParser( new VersionParser() );
+		};
+
+		// Cache services
+		$container['cache.duration'] = function () {
+			/**
+			 * Filter the default cache duration.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param int $duration Cache duration in seconds. Default: 1 hour.
+			 */
+			$default_duration = apply_filters( 'satispress_default_cache_duration', HOUR_IN_SECONDS );
+			
+			// Get configured duration from options
+			$configured_duration = get_option( 'satispress_cache_duration', $default_duration );
+			
+			return max( 60, absint( $configured_duration ) ); // Minimum 1 minute
 		};
 	}
 }

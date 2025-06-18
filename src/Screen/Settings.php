@@ -167,6 +167,22 @@ class Settings extends AbstractHookProvider {
 			'satispress',
 			'default'
 		);
+
+		add_settings_field(
+			'cache_duration',
+			'<label for="satispress-cache-duration">' . esc_html__( 'Cache Duration', 'satispress' ) . '</label>',
+			[ $this, 'render_field_cache_duration' ],
+			'satispress',
+			'default'
+		);
+
+		add_settings_field(
+			'enable_cache',
+			'<label for="satispress-enable-cache">' . esc_html__( 'Enable Cache', 'satispress' ) . '</label>',
+			[ $this, 'render_field_enable_cache' ],
+			'satispress',
+			'default'
+		);
 	}
 
 	/**
@@ -181,6 +197,19 @@ class Settings extends AbstractHookProvider {
 		if ( ! empty( $value['vendor'] ) ) {
 			$value['vendor'] = preg_replace( '/[^a-z0-9_\-\.]+/i', '', $value['vendor'] );
 		}
+
+		// Handle cache duration
+		if ( isset( $value['cache_duration'] ) ) {
+			$hours = floatval( $value['cache_duration'] );
+			$seconds = max( 60, $hours * HOUR_IN_SECONDS ); // Minimum 1 minute
+			update_option( 'satispress_cache_duration', (int) $seconds );
+			unset( $value['cache_duration'] ); // Don't save in main option
+		}
+
+		// Handle cache enablement
+		$enable_cache = isset( $value['enable_cache'] ) && $value['enable_cache'];
+		update_option( 'satispress_enable_cache', $enable_cache );
+		unset( $value['enable_cache'] ); // Don't save in main option
 
 		return (array) apply_filters( 'satispress_sanitize_settings', $value );
 	}
@@ -229,6 +258,57 @@ class Settings extends AbstractHookProvider {
 		<p>
 			<input type="text" name="satispress[vendor]" id="satispress-vendor" value="<?php echo esc_attr( $value ); ?>"><br />
 			<span class="description">Default is <code>satispress</code></span>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Display the cache duration field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_field_cache_duration() {
+		$value = get_option( 'satispress_cache_duration', HOUR_IN_SECONDS );
+		
+		// Convert to hours for display
+		$hours = $value / HOUR_IN_SECONDS;
+		?>
+		<p>
+			<input type="number" 
+				   id="satispress-cache-duration" 
+				   name="satispress[cache_duration]" 
+				   value="<?php echo esc_attr( $hours ); ?>" 
+				   min="0" 
+				   step="1" 
+				   class="small-text">
+			<label for="satispress-cache-duration"><?php esc_html_e( 'hours', 'satispress' ); ?></label><br>
+			<span class="description">
+				<?php esc_html_e( 'How long to cache the repository data. Minimum: 1 minute (0.016 hours).', 'satispress' ); ?>
+			</span>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Display the cache enable field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_field_enable_cache() {
+		$enabled = get_option( 'satispress_enable_cache', true );
+		?>
+		<p>
+			<label>
+				<input type="checkbox" 
+					   id="satispress-enable-cache" 
+					   name="satispress[enable_cache]" 
+					   value="1" 
+					   <?php checked( $enabled ); ?>>
+				<?php esc_html_e( 'Enable repository caching', 'satispress' ); ?>
+			</label><br>
+			<span class="description">
+				<?php esc_html_e( 'Cache the packages.json response to improve performance. Disable for debugging.', 'satispress' ); ?>
+			</span>
 		</p>
 		<?php
 	}

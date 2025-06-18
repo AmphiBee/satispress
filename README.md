@@ -42,6 +42,16 @@ There are several possible workflows, but SatisPress allows you to manage privat
 
 It's the missing piece for managing WordPress websites with Composer.
 
+## Enhanced Features
+
+This fork includes additional performance enhancements:
+
+### Repository Caching System
+- **Configurable cache duration**: Set custom cache times for the Composer repository
+- **Intelligent invalidation**: Automatic cache clearing when packages are updated
+- **Performance optimization**: Significant speed improvements for sites with many plugins/themes
+- **Admin controls**: Easy cache management through the WordPress admin interface
+
 ## What if I don't use Composer?
 
 SatisPress can still benefit you since it makes releases downloadable directly from your admin panel, so you don't need to log in to vendors' sites to download updates.
@@ -54,4 +64,10 @@ For installation notes, information about usage, security, and more, see the [do
 
 ## Credits
 
+### Original Project
 Created by [Brady Vercher](https://www.cedaro.com/) and supported by [Gary Jones](https://gamajo.com).
+
+### Fork Enhancements
+Enhanced and maintained by [AmphiBee](https://amphibee.fr) - Digital agency specializing in WordPress solutions.
+
+**Lead Developer**: [Olivier Gorzalka](https://github.com/OlivierGorzalka) - Implementation of the repository caching system and performance optimizations.
